@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cassino Animal - Slots Diversos</title>
+<style>
+  /* Reset e estilo básico */
+  body {
+    margin: 0; padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  header {
+    background: #1e1e1e;
+    padding: 1rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 2px solid #ffb700;
+  }
+  main {
+    flex: 1;
+    padding: 1rem;
+  }
+  footer {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    background: #1e1e1e;
+    border-top: 2px solid #ffb700;
+  }
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: #2c2c2c;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    color: #eee;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+  }
+  .tab-btn.active,
+  .tab-btn:hover {
+    background: #ffb700;
+    color: #222;
+  }
+  /* Slots */
+  .slot-row {
+    font-size: 5rem;
+    letter-spacing: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .controls {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  button.spin-btn {
+    background: #ffb700;
+    border: none;
+    color: #222;
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  button.spin-btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
+  button.spin-btn:hover:not(:disabled) {
+    background: #ffaa00;
+  }
+  #coins-display {
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+  }
+  #message {
+    font-size: 1.4rem;
+    min-height: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  /* Comprar moedas */
+  #buy-coins-btn {
+    background: #008000cc;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    margin: 0 auto 1rem;
+    display: block;
+    max-width: 180px;
+    transition: background 0.3s ease;
+  }
+  #buy-coins-btn:hover {
+    background: #009900cc;
+  }
+  /* Form modal */
+  #buy-coins-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+  #buy-coins-modal.active {
+    display: flex;
+  }
+  #buy-coins-form {
+    background: #222;
+    padding: 1.5rem 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 0 15px #ffb700;
+    position: relative;
+  }
+  #buy-coins-form h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #ffb700;
+  }
+  #buy-coins-form label {
+    display: block;
+    margin-top: 0.8rem;
+    font-weight: 600;
+  }
+  #buy-coins-form input, #buy-coins-form select {
+    width: 100%;
+    padding: 0.5rem 0.8rem;
+    margin-top: 0.3rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+  }
+  #buy-coins-form button {
+    margin-top: 1.4rem;
+    width: 100%;
+    background: #ffb700;
+    border: none;
+    color: #222;
+    font-weight: 700;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s ease;
+  }
+  #buy-coins-form button:hover {
+    background: #ffaa00;
+  }
+  #buy-coins-close {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 2rem;
+    color: #ffb700;
+    cursor: pointer;
+    font-weight: 700;
+    user-select: none;
+  }
+  /* Responsividade */
+  @media (max-width: 480px) {
+    .slot-row {
+      font-size: 3.5rem;
+      letter-spacing: 0.6rem;
+    }
+    button.spin-btn {
+      font-size: 1rem;
+      padding: 0.8rem 1.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+<header>Cassino Animal 🐾</header>
+<main>
+  <nav class="tabs" role="tablist" aria-label="Jogos de Slot">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tigrinho-tab" id="tigrinho-tab-btn">Tigrinho 🐯</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="coelho-tab" id="coelho-tab-btn">Coelho 🐰</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="touro-tab" id="touro-tab-btn">Touro 🐮</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="ratinho-tab" id="ratinho-tab-btn">Ratinho 🐭</button>
+  </nav>
+
+  <section id="tigrinho-tab" role="tabpanel" aria-labelledby="tigrinho-tab-btn">
+    <div id="coins-display">Moedas: 100</div>
+    <div class="slot-row" id="tigrinho-slot">🐯 🐯 🐯</div>
+    <div class="controls">
+      <button class="spin-btn" id="tigrinho-spin-btn">GIRAR (-5 moedas)</button>
+    </div>
+    <div id="tigrinho-message" class="message"></div>
+  </section>
+
+  <section id="coelho-tab" role="tabpanel" aria-labelledby="coelho-tab-btn" hidden>
+    <div class="slot-row" id="coelho-slot">🐰 🐰 🐰</div>
+    <div class="controls">
+      <button class="spin-btn" id="coelho-spin-btn">GIRAR (-5 moedas)</button>
+    </div>
+    <div id="coelho-message" class="message"></div>
+  </section>
+
+  <section id="touro-tab" role="tabpanel" aria-labelledby="touro-tab-btn" hidden>
+    <div class="slot-row" id="touro-slot">🐮 🐮 🐮</div>
+    <div class="controls">
+      <button class="spin-btn" id="touro-spin-btn">GIRAR (-5 moedas)</button>
+    </div>
+    <div id="touro-message" class="message"></div>
+  </section>
+
+  <section id="ratinho-tab" role="tabpanel" aria-labelledby="ratinho-tab-btn" hidden>
+    <div class="slot-row" id="ratinho-slot">🐭 🐭 🐭</div>
+    <div class="controls">
+      <button class="spin-btn" id="ratinho-spin-btn">GIRAR (-5 moedas)</button>
+    </div>
+    <div id="ratinho-message" class="message"></div>
+  </section>
+
+  <button id="buy-coins-btn" aria-haspopup="dialog" aria-controls="buy-coins-modal">Comprar Moedas</button>
+
+  <div id="buy-coins-modal" role="dialog" aria-modal="true" aria-labelledby="buy-coins-title" tabindex="-1">
+    <div id="buy-coins-form">
+      <div id="buy-coins-close" role="button" aria-label="Fechar formulário">&times;</div>
+      <h2 id="buy-coins-title">Comprar Moedas (PIX)</h2>
+      <form id="buy-form">
+        <label for="buyer-name">Seu nome:</label>
+        <input type="text" id="buyer-name" name="buyer-name" required autocomplete="name" />
+
+        <label for="buyer-phone">Telefone (WhatsApp):</label>
+        <input type="tel" id="buyer-phone" name="buyer-phone" required placeholder="(XX) 9XXXX-XXXX" autocomplete="tel" />
+
+        <label for="amount">Valor a pagar (R$):</label>
+        <select id="amount" name="amount" required>
+          <option value="" disabled selected>Escolha o valor</option>
+          <option value="10">R$10 (50 moedas)</option>
+          <option value="20">R$20 (110 moedas)</option>
+          <option value="50">R$50 (300 moedas)</option>
+        </select>
+
+        <button type="submit">Enviar pedido</button>
+      </form>
+    </div>
+  </div>
+</main>
+<footer>Jogo por diversão — sem dinheiro real. Faça jogo responsável.</footer>
+
+<script>
+  (() => {
+    const games = {
+      tigrinho: {
+        symbols: ["🐯", "🍒", "🔔", "⭐️", "🍀"],
+        slotEl: document.getElementById("tigrinho-slot"),
+        spinBtn: document.getElementById("tigrinho-spin-btn"),
+        msgEl: document.getElementById("tigrinho-message"),
+      },
+      coelho: {
+        symbols: ["🐰", "🍓", "🍋", "🌟", "🍇"],
+        slotEl: document.getElementById("coelho-slot"),
+        spinBtn: document.getElementById("coelho-spin-btn"),
+        msgEl: document.getElementById("coelho-message"),
+      },
+      touro: {
+        symbols: ["🐮", "🍎", "🔔", "🌟", "🍉"],
+        slotEl: document.getElementById("touro-slot"),
+        spinBtn: document.getElementById("touro-spin-btn"),
+        msgEl: document.getElementById("touro-message"),
+      },
+      ratinho: {
+        symbols: ["🐭", "🍬", "🍒", "⭐️", "🍋"],
+        slotEl: document.getElementById("ratinho-slot"),
+        spinBtn: document.getElementById("ratinho-spin-btn"),
+        msgEl: document.getElementById("ratinho-message"),
+      }
+    };
+
+    const coinsKey = "cassinoAnimalCoins";
+    let coins = parseInt(localStorage.getItem(coinsKey)) || 100;
+
+    const coinsDisplay = document.getElementById("coins-display");
+    const buyBtn = document.getElementById("buy-coins-btn");
+    const buyModal = document.getElementById("buy-coins-modal");
+    const buyClose = document.getElementById("buy-coins-close");
+    const buyForm = document.getElementById("buy-form");
+
+    function updateCoinsDisplay() {
+      coinsDisplay.textContent = `Moedas: ${coins}`;
+      Object.values(games).forEach(game => {
+        game.spinBtn.disabled = coins < 5 || game.spinBtn.disabled;
+      });
+    }
+
+    function randomSymbol(game) {
+      const syms = games[game].symbols;
+      return syms[Math.floor(Math.random() * syms.length)];
+    }
+
+    function spin(gameName) {
+      const game = games[gameName];
+      if (coins < 5) {
+        game.msgEl.textContent = "Sem moedas suficientes!";
+        return;
+      }
+      coins -= 5;
+      updateCoinsDisplay();
+      game.spinBtn.disabled = true;
+      game.msgEl.textContent = "Girando...";
+
+      let spinCount = 0;
+      const spinInterval = setInterval(() => {
+        const reel = [randomSymbol(gameName), randomSymbol(gameName), randomSymbol(gameName)];
+        game.slotEl.textContent = reel.join(" ");
+        spinCount++;
+        if (spinCount >= 10) {
+          clearInterval(spinInterval);
+          evaluate(gameName, reel);
+          game.spinBtn.disabled = false;
+        }
+      }, 100);
+    }
+
+    function evaluate(gameName, reel) {
+      const game = games[gameName];
+      if (reel[0] === reel[1] && reel[1] === reel[2]) {
+        coins += 50;
+        game.msgEl.textContent = "🎉 Três iguais! Você ganhou 50 moedas!";
+      } else if (reel[0] === reel[1] || reel[1] === reel[2] || reel[0] === reel[2]) {
+        coins += 15;
+        game.msgEl.textContent = "👍 Dois iguais! Você ganhou 15 moedas!";
+      } else {
+        game.msgEl.textContent = "😞 Tente de novo!";
+      }
+      updateCoinsDisplay();
+    }
+
+    Object.entries(games).forEach(([name, game]) => {
+      game.spinBtn.addEventListener("click", () => spin(name));
+      game.slotEl.textContent = [randomSymbol(name), randomSymbol(name), randomSymbol(name)].join(" ");
+      game.msgEl.textContent = "";
+    });
+
+    updateCoinsDisplay();
+
+    const tabs = document.querySelectorAll(".tab-btn");
+    const panels = document.querySelectorAll("section[role=tabpanel]");
+
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => {
+          t.classList.remove("active");
+          t.setAttribute("aria-selected", "false");
+        });
+        panels.forEach(p => p.hidden = true);
+        tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
+        const panel = document.getElementById(tab.getAttribute("aria-controls"));
+        panel.hidden = false;
+      });
+    });
+
+    buyBtn.addEventListener("click", () => {
+      buyModal.classList.add("active");
+      buyModal.focus();
+    });
+    buyClose.addEventListener("click", () => {
+      buyModal.classList.remove("active");
+      buyForm.reset();
+    });
+    buyModal.addEventListener("click", e => {
+      if (e.target === buyModal) {
+        buyModal.classList.remove("active");
+        buyForm.reset();
+      }
+    });
+
+    buyForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const name = buyForm["buyer-name"].value.trim();
+      const phone = buyForm["buyer-phone"].value.trim();
+      const amount = buyForm["amount"].value;
+      if (!name || !phone || !amount) {
+        alert("Preencha todos os campos!");
+        return;
+      }
+      alert(`Pedido enviado!\n\nNome: ${name}\nTelefone: ${phone}\nValor: R$${amount}\n\nVocê receberá instruções para o PIX.`);
+      buyModal.classList.remove("active");
+      buyForm.reset();
+    });
+
+  })();
+</script>
+</body>
+</html>
